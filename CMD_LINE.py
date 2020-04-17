@@ -1,6 +1,7 @@
 import socket as sock
 import cv2 as cv
 import numpy as np
+import selectors
 
 class socket_wrapper :
     # A simple wrapper class to handle sockets
@@ -38,15 +39,16 @@ class server :
     # A simple class to handle server creation
     # May need to be put on a separate thread later
 
-    def __init__(self, socket = None) :
+    def __init__(self, port, socket = None) :
         if socket == None :
             self.socket = sock.socket(sock.AF_INET, sock.SOCK_STREAM)
         else :
             self.socket = socket
 
-        self.socket.bind(('', 8080))
-
+        self.socket.bind(('', port))
         self.socket.listen(5)
+        hostname = str(sock.gethostname())
+        print("Listening on port " + str(port) + ". IP is " + sock.gethostbyname(hostname))
 
     def run(self) :
         while True :
@@ -57,11 +59,11 @@ def main():
     a = input()
 
     if a == "server" :
-        main_server = server(sock.socket(sock.AF_INET, sock.SOCK_STREAM))
+        main_server = server(8080, sock.socket(sock.AF_INET, sock.SOCK_STREAM))
         main_server.run()
     else :
         client = socket_wrapper(sock.socket(sock.AF_INET, sock.SOCK_STREAM))
-        client.connect('localhost', 8080)
+        client.connect(str(input("Ip to connect to: ")), 8080)
 
 if __name__ == "__main__" :
     main()
